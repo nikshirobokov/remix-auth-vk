@@ -130,7 +130,7 @@ export class VKStrategy<User> extends OAuth2Strategy<
     const response = await fetch(url.toString())
     const contentType = response.headers.get('Content-Type')
     const json: VKProfile['_json'] =
-      contentType === 'application/json' && (await response.json())
+      contentType?.includes('application/json') && (await response.json())
 
     if (!response.ok) {
       return {
