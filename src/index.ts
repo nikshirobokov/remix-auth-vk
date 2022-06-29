@@ -64,12 +64,24 @@ export class VKStrategy<User> extends OAuth2Strategy<
 
   private readonly userInfoURL = 'https://api.vk.com/method/users.get'
 
-  private readonly userFields = ['about', 'has_photo', 'photo_max_orig', 'screen_name']
+  private readonly userFields = [
+    'about',
+    'has_photo',
+    'photo_max_orig',
+    'screen_name',
+  ]
 
   private readonly extraUserFields: VKStrategyOptions['extraUserFields'] = []
 
   constructor(
-    { clientID, clientSecret, callbackURL, scope = '', display, extraUserFields }: VKStrategyOptions,
+    {
+      clientID,
+      clientSecret,
+      callbackURL,
+      scope = '',
+      display,
+      extraUserFields,
+    }: VKStrategyOptions,
     verify: StrategyVerifyCallback<
       User,
       OAuth2StrategyVerifyParams<VKProfile, VKExtraParams>
@@ -130,7 +142,7 @@ export class VKStrategy<User> extends OAuth2Strategy<
       }
     }
     const json: VKProfile['_json'] = await response.json()
-    const [raw] = json.response;
+    const [raw] = json.response
 
     return {
       provider: 'vk',

@@ -22,21 +22,21 @@ Follow the steps on [the VK documentation](https://vk.com/dev/first_guide?f=2.%2
 ### Create the strategy instance
 
 ```ts
-import { VKStrategy } from "remix-auth-vk";
+import { VKStrategy } from 'remix-auth-vk'
 
-let vkStrategy = new VKStrategy(
+const vkStrategy = new VKStrategy(
   {
-    clientID: "YOUR_CLIENT_ID",
-    clientSecret: "YOUR_CLIENT_SECRET",
-    callbackURL: "https://example.com/auth/vk/callback"
+    clientID: 'YOUR_CLIENT_ID',
+    clientSecret: 'YOUR_CLIENT_SECRET',
+    callbackURL: 'https://example.com/auth/vk/callback',
   },
   async ({ accessToken, refreshToken, extraParams, profile }) => {
     // Get the user data from your DB or API using the tokens and profile
-    return User.findOrCreate({ email: profile.emails[0].value });
+    return User.findOrCreate({ email: profile.emails[0].value })
   }
-);
+)
 
-authenticator.use(vkStrategy);
+authenticator.use(vkStrategy)
 ```
 
 ### Setup your routes
@@ -57,9 +57,9 @@ export default function Login() {
 import { ActionFunction, LoaderFunction } from 'remix'
 import { authenticator } from '~/auth.server'
 
-export let loader: LoaderFunction = () => redirect('/login')
+export const loader: LoaderFunction = () => redirect('/login')
 
-export let action: ActionFunction = ({ request }) => {
+export const action: ActionFunction = ({ request }) => {
   return authenticator.authenticate('vk', request)
 }
 ```
@@ -69,7 +69,7 @@ export let action: ActionFunction = ({ request }) => {
 import { ActionFunction, LoaderFunction } from 'remix'
 import { authenticator } from '~/auth.server'
 
-export let loader: LoaderFunction = ({ request }) => {
+export const loader: LoaderFunction = ({ request }) => {
   return authenticator.authenticate('vk', request, {
     successRedirect: '/dashboard',
     failureRedirect: '/login',
