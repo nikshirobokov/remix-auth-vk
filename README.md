@@ -30,7 +30,7 @@ const vkStrategy = new VKStrategy(
     clientSecret: 'YOUR_CLIENT_SECRET',
     callbackURL: 'https://example.com/auth/vk/callback',
   },
-  async ({ accessToken, refreshToken, extraParams, profile }) => {
+  async ({ accessToken, extraParams, profile }) => {
     // Get the user data from your DB or API using the tokens and profile
     return User.findOrCreate({ email: profile.emails[0].value })
   }
