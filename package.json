@@ -13,10 +13,21 @@
   "keywords": [
     "remix",
     "remix-auth",
+    "oauth",
     "auth",
     "authentication",
-    "strategy"
+    "strategy",
+    "vk-auth"
   ],
+  "author": {
+    "name": "Nikita Shirobokov",
+    "email": "ns.shirobokov@gmail.com",
+    "url": "https://github.com/nikshirobokov"
+  },
+  "repository": {
+    "url": "https://github.com/nikshirobokov/remix-auth-vk.git",
+    "type": "git"
+  },
   "license": "MIT",
   "files": [
     "build",
@@ -52,6 +63,6 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "remix-auth": "^3.0.0"
+    "remix-auth-oauth2": "^1.2.2"
   }
 }
