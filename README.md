@@ -13,6 +13,16 @@ The VK strategy is used to authenticate users against a VK account. It extends t
 
 <!-- If it doesn't support one runtime, explain here why -->
 
+## Installation
+
+```console
+npm i remix-auth-vk
+```
+
+```console
+yarn add remix-auth-vk
+```
+
 ## Usage
 
 ### Create VK application
