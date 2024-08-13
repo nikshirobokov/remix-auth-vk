@@ -1,3 +1,5 @@
+[English]([url](https://github.com/nikshirobokov/remix-auth-vk/README-en.md))
+
 # VKStrategy
 
 <!-- Description -->
