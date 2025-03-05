@@ -1,21 +1,19 @@
-[English]([url](https://github.com/nikshirobokov/remix-auth-vk/README-en.md))
-
 # VKStrategy
 
 <!-- Description -->
 
-Пользователи смогут использовать свой аккаунт VK для входа на ваш Remix сайт. Данная стратегия `remix-auth-vk` является надстройкой над Remix библиотекой `OAuth2Strategy`.
+The VK strategy is used to authenticate users against a VK account. It extends the OAuth2Strategy.
 
-## Среда разработки
+## Supported runtimes
 
-| Среда      | Поддерживается |
+| Runtime    | Has Support |
 | ---------- | ----------- |
 | Node.js    | ✅          |
 | Cloudflare | ✅          |
 
 <!-- If it doesn't support one runtime, explain here why -->
 
-## Установка
+## Installation
 
 ```console
 npm i remix-auth-vk
@@ -25,25 +23,25 @@ npm i remix-auth-vk
 yarn add remix-auth-vk
 ```
 
-## Использование
+## Usage
 
-### Создайте приложение VK
+### Create VK application
 
-Следуйте шагам в инструкции [Документация VK](https://vk.com/dev/first_guide?f=2.%20Application%20registration), чтобы создать новое приложение VK и получить свой client ID и защищенный ключ.
+Follow the steps on [the VK documentation](https://vk.com/dev/first_guide?f=2.%20Application%20registration) to create a new application and get a client ID and secret.
 
-### Создайте стратегию
+### Create the strategy instance
 
 ```ts
 import { VKStrategy } from 'remix-auth-vk'
 
 const vkStrategy = new VKStrategy(
   {
-    clientID: 'ВАШ_CLIENT_ID',
-    clientSecret: 'ВАШ_ЗАЩИЩЕННЫЙ_КЛЮЧ',
+    clientID: 'YOUR_CLIENT_ID',
+    clientSecret: 'YOUR_CLIENT_SECRET',
     callbackURL: 'https://example.com/auth/vk/callback',
   },
   async ({ accessToken, extraParams, profile }) => {
-    // Псевдо-код по обработке данных пользователя и т.п.
+    // Get the user data from your DB or API using the tokens and profile
     return User.findOrCreate({ email: profile.emails[0].value })
   }
 )
@@ -51,15 +49,14 @@ const vkStrategy = new VKStrategy(
 authenticator.use(vkStrategy)
 ```
 
-### Настройте маршрутизацию сайта
+### Setup your routes
 
 ```tsx
 // app/routes/login.tsx
 export default function Login() {
-  // Страница авторизации
   return (
     <Form action="/auth/vk" method="post">
-      <button>Войти с VK</button>
+      <button>Login with VK</button>
     </Form>
   )
 }
