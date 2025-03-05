@@ -1,7 +1,7 @@
 {
   "name": "remix-auth-vk",
   "description": "The VK strategy is used to authenticate users against a VK account. It extends the OAuth2Strategy.",
-  "version": "2.0.1",
+  "version": "2.0.0-beta.1",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "sideEffects": false,
