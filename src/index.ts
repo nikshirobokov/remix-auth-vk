@@ -25,9 +25,9 @@ export class VKStrategy<User> extends OAuth2Strategy<User> {
 
   constructor(
     {
-      clientID,
+      clientId,
       clientSecret,
-      callbackURL,
+      redirectURI,
       apiVersion,
       display,
       scopes,
@@ -37,9 +37,9 @@ export class VKStrategy<User> extends OAuth2Strategy<User> {
   ) {
     super(
       {
-        clientId: clientID,
+        clientId,
         clientSecret,
-        redirectURI: callbackURL,
+        redirectURI,
         authorizationEndpoint: 'https://oauth.vk.com/authorize',
         tokenEndpoint: 'https://oauth.vk.com/access_token',
         scopes: VKStrategy.parseScopes(scopes),

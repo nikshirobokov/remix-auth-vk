@@ -11,9 +11,9 @@ export type VKScope = 'email' | 'friends' | 'video' | 'photos' | string
 export type VKAuthDialogDisplay = 'page' | 'popup' | 'mobile'
 
 export type VKStrategyOptions = {
-  clientID: string
+  clientId: string
   clientSecret: string
-  callbackURL: string
+  redirectURI: string
   /**
    * @default "5.131"
    */
