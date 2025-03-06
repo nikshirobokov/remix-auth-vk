@@ -1,105 +1,51 @@
-import type { StrategyVerifyCallback } from 'remix-auth'
-import type {
-  OAuth2Profile,
-  OAuth2StrategyVerifyParams,
-} from 'remix-auth-oauth2'
 import { OAuth2Strategy } from 'remix-auth-oauth2'
-
-export type VKAuthDialogDisplay = 'page' | 'popup' | 'mobile'
-
-export type VKStrategyOptions = {
-  clientID: string
-  clientSecret: string
-  callbackURL: string
-  /**
-   * @default "5.131"
-   */
-  apiVersion?: string
-  display?: VKAuthDialogDisplay
-  /**
-   * @default "email"
-   * @example "friends,video,photos"
-   */
-  scope?: string
-  /**
-   * List of available user fields here https://dev.vk.com/method/users.get.
-   * */
-  userFields?: string[]
-}
-
-export type VKProfile = {
-  id: string
-  displayName: string
-  name: {
-    familyName: string
-    givenName: string
-  }
-  emails: { value: string }[]
-  photos: { value: string }[]
-  _json: {
-    response: ({
-      id: number
-      photo_max_orig: string
-      has_photo: 0 | 1
-      screen_name: string
-      first_name: string
-      last_name: string
-      can_access_closed: boolean
-      is_closed: boolean
-    } & Record<string, never>)[]
-  }
-} & OAuth2Profile
-
-export type VKExtraParams = {
-  access_token: string
-  email: string
-  expires_in: number
-  user_id: number
-} & Record<string, string | number>
-
-export class VKStrategy<User> extends OAuth2Strategy<
-  User,
+import type { Strategy } from 'remix-auth/strategy'
+import type {
+  VKAuthDialogDisplay,
+  VKExtraParams,
   VKProfile,
-  VKExtraParams
-> {
-  public name = 'vk'
+  VKStrategyOptions,
+} from './types.js'
+export * from './types.js'
+
+export const VKStrategyName = 'vk'
+export const VKScopesSeparator = ','
+export const VKStrategyDefaultScopes = ['email'].join(VKScopesSeparator)
+
+export class VKStrategy<User> extends OAuth2Strategy<User> {
+  public override name = VKStrategyName
 
   private readonly apiVersion: string
 
   private readonly display: VKAuthDialogDisplay
 
-  private readonly scope: string
-
   private readonly userFields: string[]
 
-  private readonly userInfoURL = 'https://api.vk.com/method/users.get'
+  public static userInfoURL = 'https://api.vk.com/method/users.get'
 
   constructor(
     {
-      clientID,
+      clientId,
       clientSecret,
-      callbackURL,
+      redirectURI,
       apiVersion,
       display,
-      scope,
+      scopes,
       userFields,
     }: VKStrategyOptions,
-    verify: StrategyVerifyCallback<
-      User,
-      OAuth2StrategyVerifyParams<VKProfile, VKExtraParams>
-    >
+    verify: Strategy.VerifyFunction<User, OAuth2Strategy.VerifyOptions>,
   ) {
     super(
       {
-        clientID,
+        clientId,
         clientSecret,
-        callbackURL,
-        authorizationURL: 'https://oauth.vk.com/authorize',
-        tokenURL: 'https://oauth.vk.com/access_token',
+        redirectURI,
+        authorizationEndpoint: 'https://oauth.vk.com/authorize',
+        tokenEndpoint: 'https://oauth.vk.com/access_token',
+        scopes: VKStrategy.parseScopes(scopes),
       },
-      verify
+      verify,
     )
-    this.scope = scope ?? 'email'
     this.display = display ?? 'page'
     this.userFields = userFields ?? [
       'has_photo',
@@ -109,18 +55,25 @@ export class VKStrategy<User> extends OAuth2Strategy<
     this.apiVersion = apiVersion ?? '5.131'
   }
 
-  protected authorizationParams(): URLSearchParams {
-    return new URLSearchParams({
-      scope: this.scope,
-      display: this.display,
-    })
+  protected override authorizationParams(
+    params: URLSearchParams,
+  ): URLSearchParams {
+    const authParams = new URLSearchParams(params)
+
+    authParams.set('display', this.display)
+
+    if (this.options.scopes) {
+      authParams.set('scope', this.options.scopes.join(VKScopesSeparator))
+    }
+
+    return authParams
   }
 
   protected async userProfile(
     accessToken: string,
-    extraParams: VKExtraParams
+    extraParams: VKExtraParams,
   ): Promise<VKProfile> {
-    const url = new URL(this.userInfoURL)
+    const url = new URL(VKStrategy.userInfoURL)
 
     url.searchParams.append('access_token', accessToken)
     url.searchParams.append('user_ids', String(extraParams.user_id))
@@ -128,27 +81,14 @@ export class VKStrategy<User> extends OAuth2Strategy<
     url.searchParams.append('fields', this.userFields.join(','))
 
     const response = await fetch(url.toString())
-    const contentType = response.headers.get('Content-Type')
-    const json: VKProfile['_json'] =
-      contentType?.includes('application/json') && (await response.json())
-
-    if (!response.ok) {
-      return {
-        provider: this.name,
-        id: String(extraParams.user_id),
-        displayName: '',
-        name: {
-          familyName: '',
-          givenName: '',
-        },
-        emails: [{ value: extraParams.email }],
-        photos: [],
-        _json: json ?? {
-          response: [],
-        },
-      }
-    }
+    const json: VKProfile['_json'] = await response.json()
     const [user] = json.response
+
+    if (!user) {
+      throw new Error(
+        'The user profile was not found in the provider response.',
+      )
+    }
 
     return {
       provider: this.name,
@@ -162,5 +102,13 @@ export class VKStrategy<User> extends OAuth2Strategy<
       photos: [{ value: user.photo_max_orig }],
       _json: json,
     }
+  }
+
+  public static parseScopes(scopes: VKStrategyOptions['scopes']) {
+    if (!scopes || scopes.length === 0) {
+      return [VKStrategyDefaultScopes]
+    }
+
+    return scopes
   }
 }

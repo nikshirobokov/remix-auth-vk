@@ -43,7 +43,7 @@ const vkStrategy = new VKStrategy(
   async ({ accessToken, extraParams, profile }) => {
     // Get the user data from your DB or API using the tokens and profile
     return User.findOrCreate({ email: profile.emails[0].value })
-  }
+  },
 )
 
 authenticator.use(vkStrategy)
